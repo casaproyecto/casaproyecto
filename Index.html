@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Casa Proyecto — Locación para Producciones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg:       #F4F4F4;
+  --bg-alt:   #E8EFF6;
+  --white:    #FFFFFF;
+  --text:     #03396C;
+  --soft:     #5A7FA0;
+  --accent:   #B3CDE0;
+  --dark:     #03396C;
+  --border:   rgba(3,57,108,0.14);
+  --pill:     999px;
+  --card:     16px;
+  --shadow:   0 6px 32px rgba(3,57,108,0.09);
+  --shadow-lg:0 16px 56px rgba(3,57,108,0.15);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Jost', sans-serif;
+  font-weight:300;
+  overflow-x:hidden;
+}
+
+/* Baskerville for all headings */
+h1,h2,h3,.logo,.s-title,.h-title,.ct-title,.f-logo {
+  font-family:'Libre Baskerville', serif;
+}
+
+/* ── CURSOR ── */
+#cur { width:8px; height:8px; background:var(--dark); border-radius:50%; position:fixed; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); transition:width .2s,height .2s; }
+#cur-ring { width:32px; height:32px; border:1.5px solid var(--accent); border-radius:50%; position:fixed; pointer-events:none; z-index:9998; transform:translate(-50%,-50%); transition:all .15s ease; opacity:.5; }
+
+/* ── NAV ── */
+nav {
+  height: 72px;              /* altura fija */
+  display: flex;
+  align-items: center;       /* centra verticalmente */
+  justify-content: space-between;
+  padding: 0 60px;           /* sacamos el padding vertical */
+  position:fixed; top:0; left:0; right:0; z-index:500;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:18px 60px;
+  background:rgba(244,244,244,0.96);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  transition:background .4s ease, box-shadow .4s ease;
+}
+nav.scrolled {
+  background:rgba(244,244,244,0.65);
+  box-shadow:none;
+  border-bottom-color:transparent;
+}
+.logo { display:flex; align-items:center; text-decoration:none; }
+.logo img { height:60px; width:auto; display:block; }
+.nav-links { display:flex; gap:32px; list-style:none; }
+.nav-links a {
+  font-family:'Jost',sans-serif;
+  font-size:.68rem; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--soft); text-decoration:none; transition:color .25s;
+}
+.nav-links a:hover, .nav-links a.active { color:var(--dark); font-weight:500; }
+
+#ambientes, #trabajos, #mapa, #contacto { scroll-margin-top:72px; }
+
+/* ── HERO ── */
+#hero { position:relative; width:100%; height:100vh; overflow:hidden; }
+
+.slide { position:absolute; inset:0; opacity:0; transition:opacity 2.2s ease; background:#C8D9E8 center/cover no-repeat; }
+.slide.active { opacity:1; }
+
+.hero-veil {
+  position:absolute; inset:0; z-index:2;
+  background:linear-gradient(to bottom, rgba(3,57,108,.18) 0%, rgba(3,57,108,.42) 100%);
+}
+
+.hero-body {
+  position:absolute; inset:0; z-index:10;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  text-align:center; padding:0 24px;
+  
+}
+
+.h-eyebrow {
+  font-family:'Jost',sans-serif;
+  font-size:.65rem; letter-spacing:.36em; text-transform:uppercase;
+  color:rgba(255,255,255,.8); margin-bottom:18px;
+  opacity:0; animation:up 1s ease .5s forwards;
+}
+.h-title {
+  font-size:clamp(4.5rem,11vw,10rem);
+  font-weight:700; line-height:.88; letter-spacing:.02em; color:#fff;
+  text-shadow:0 4px 32px rgba(3,57,108,.3);
+  opacity:0; animation:up 1.1s ease .8s forwards;
+}
+.h-title em { font-style:italic; color:var(--accent); font-weight:400; }
+.h-sub {
+  font-family:'Jost',sans-serif;
+  max-width:480px; margin-top:26px;
+  font-size:.92rem; line-height:1.85; color:rgba(255,255,255,.82);
+  opacity:0; animation:up 1s ease 1.1s forwards;
+}
+.h-cta {
+  font-family:'Jost',sans-serif;
+  margin-top:40px; padding:14px 42px;
+  background:#fff; color:var(--dark);
+  text-decoration:none; font-size:.68rem;
+  letter-spacing:.2em; text-transform:uppercase;
+  border-radius:var(--pill);
+  box-shadow:0 6px 22px rgba(3,57,108,.22);
+  opacity:0; animation:up 1s ease 1.4s forwards;
+  transition:background .3s,color .3s,transform .3s,box-shadow .3s;
+  display:inline-block;
+}
+.h-cta:hover { background:var(--dark); color:#fff; transform:translateY(-2px); box-shadow:0 12px 32px rgba(3,57,108,.3); }
+
+.dots {
+  position:absolute; bottom:30px; left:50%; transform:translateX(-50%);
+  display:flex; gap:8px; z-index:20;
+}
+.dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.35); cursor:pointer; transition:background .35s,transform .35s; }
+.dot.on { background:#fff; transform:scale(1.45); }
+
+.s-hint {
+  position:absolute; bottom:34px; right:60px; z-index:20;
+  display:flex; align-items:center; gap:10px;
+  font-family:'Jost',sans-serif;
+  font-size:.6rem; letter-spacing:.22em; text-transform:uppercase;
+  color:rgba(255,255,255,.55);
+}
+.s-line { width:36px; height:1px; background:rgba(255,255,255,.3); position:relative; overflow:hidden; }
+.s-line::after { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:#fff; animation:slide-line 2s ease infinite; }
+
+/* ── DIVIDER ── */
+.div { width:100%; height:1px; background:var(--border); position:relative; }
+.div::after { content:'◆'; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); font-size:.42rem; color:var(--accent); background:var(--bg); padding:0 14px; }
+.div.on-white::after { background:var(--white); }
+.div.on-alt::after   { background:var(--bg-alt); }
+
+/* ── SECTIONS ── */
+section { padding:96px 60px; }
+.s-label { font-family:'Jost',sans-serif; font-size:.62rem; letter-spacing:.3em; text-transform:uppercase; color:var(--soft); margin-bottom:12px; }
+.s-title { font-size:clamp(2.2rem,4.5vw,3.4rem); font-weight:700; line-height:1.1; color:var(--text); }
+.s-title em { font-style:italic; color:var(--soft); font-weight:400; }
+
+/* ── AMBIENTES ── */
+#ambientes { background:var(--white); }
+.amb-head { display:flex; flex-direction:column; align-items:center; text-align:center; margin-bottom:52px; }
+
+.switch { display:inline-flex; background:var(--bg-alt); border-radius:var(--pill); padding:4px; margin-top:32px; gap:3px; }
+.sw-btn {
+  font-family:'Jost',sans-serif;
+  padding:11px 32px; font-size:.68rem; font-weight:400;
+  letter-spacing:.14em; text-transform:uppercase;
+  border:none; background:transparent; color:var(--soft);
+  border-radius:var(--pill); cursor:pointer; transition:all .32s ease;
+}
+.sw-btn.on { background:var(--white); color:var(--dark); box-shadow:0 3px 14px rgba(3,57,108,.12); font-weight:500; }
+
+/* Room grid */
+.rooms-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
+  gap:16px; max-width:1100px; margin:0 auto;
+  animation:appear .4s ease;
+}
+
+.folder {
+  border-radius:var(--card);
+  border:1.5px solid var(--border);
+  background:var(--bg);
+  overflow:hidden;
+  cursor:pointer;
+  transition:all .3s ease;
+  position:relative;
+  display:flex; flex-direction:column;
+}
+.folder:hover { border-color:var(--accent); transform:translateY(-5px); box-shadow:var(--shadow-lg); }
+.folder:hover .f-name { color:var(--dark); }
+.folder:hover .f-overlay { opacity:1; }
+.folder:hover .f-tag { opacity:1; }
+
+.f-cover {
+  width:100%; aspect-ratio:4/3;
+  object-fit:cover; display:block;
+  background:var(--bg-alt);
+  transition:transform .4s ease;
+}
+.folder:hover .f-cover { transform:scale(1.04); }
+
+.f-cover-wrap { overflow:hidden; position:relative; }
+
+.f-overlay {
+  position:absolute; inset:0;
+  background:linear-gradient(to bottom, transparent 40%, rgba(3,57,108,.5) 100%);
+  opacity:0; transition:opacity .3s;
+}
+
+.f-footer {
+  padding:14px 16px 12px;
+  display:flex; align-items:center; justify-content:space-between;
+  background:var(--white);
+}
+.f-name {
+  font-family:'Libre Baskerville',serif;
+  font-size:.78rem; font-weight:400; letter-spacing:.04em;
+  color:var(--soft); transition:color .3s;
+}
+.f-tag {
+  font-family:'Jost',sans-serif;
+  font-size:.55rem; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--accent); opacity:0; transition:opacity .3s;
+}
+
+/* Placeholder if no cover */
+.f-cover-placeholder {
+  width:100%; aspect-ratio:4/3;
+  background:var(--bg-alt);
+  display:flex; align-items:center; justify-content:center;
+}
+.f-cover-placeholder svg { width:44px; height:34px; }
+
+/* ── TRABAJOS ── */
+#trabajos { background:var(--bg-alt); }
+.tj-head { margin-bottom:48px; }
+.frames { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; max-width:1100px; }
+.frame { aspect-ratio:16/10; border-radius:var(--card); background:var(--bg); border:1.5px dashed rgba(3,57,108,.15); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; }
+.f-num { font-family:'Libre Baskerville',serif; font-size:2rem; color:rgba(3,57,108,.12); line-height:1; }
+.f-lbl { font-family:'Jost',sans-serif; font-size:.56rem; letter-spacing:.2em; text-transform:uppercase; color:rgba(3,57,108,.28); }
+
+/* ── MAPA ── */
+#mapa { background:var(--white); padding-bottom:0; }
+.mapa-top { margin-bottom:44px; }
+.mapa-badge {
+  font-family:'Jost',sans-serif;
+  display:inline-flex; align-items:center; gap:9px;
+  margin-top:18px; padding:10px 22px;
+  background:var(--bg-alt); border-radius:var(--pill);
+  font-size:.76rem; color:var(--soft);
+}
+.map-wrap {
+  width:100%; height:460px; overflow:hidden;
+  border-radius:var(--card) var(--card) 0 0;
+}
+.map-wrap iframe { width:100%; height:100%; border:none; display:block; }
+
+/* ── CONTACTO ── */
+#contacto {
+  background:var(--bg); text-align:center;
+  padding:72px 60px; position:relative; overflow:hidden;
+}
+#contacto::before {
+  content:'CP'; position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  font-family:'Libre Baskerville',serif; font-size:28vw; font-weight:700;
+  color:rgba(3,57,108,.04); pointer-events:none; white-space:nowrap;
+}
+.ct-eye { font-family:'Jost',sans-serif; font-size:.62rem; letter-spacing:.3em; text-transform:uppercase; color:var(--soft); margin-bottom:10px; }
+.ct-title { font-size:clamp(1.9rem,3.5vw,2.8rem); font-weight:700; line-height:1.15; color:var(--text); margin-bottom:36px; }
+.ct-title em { font-style:italic; font-weight:400; color:var(--soft); }
+
+/* cards rule moved into .card block */
+.cards {
+  display:flex; justify-content:center; gap:16px;
+  flex-wrap:nowrap; position:relative; z-index:2;
+  align-items:stretch;
+}
+.card {
+  background:var(--white); border:1.5px solid var(--border);
+  border-radius:var(--card); padding:26px 30px;
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+  text-decoration:none;
+  width:auto; min-width:0; flex:0 1 auto;
+  white-space:nowrap;
+  box-shadow:0 4px 20px rgba(3,57,108,.06);
+  transition:all .32s ease;
+}
+.card:hover { border-color:var(--accent); transform:translateY(-4px); box-shadow:var(--shadow-lg); }
+.card-ico { font-size:1.3rem; }
+.card-lbl { font-family:'Jost',sans-serif; font-size:.56rem; letter-spacing:.2em; text-transform:uppercase; color:var(--soft); }
+.card-val { font-family:'Libre Baskerville',serif; font-size:1rem; font-weight:400; color:var(--text); letter-spacing:.02em; white-space:nowrap; }
+.card-val--email { font-size:.88rem; white-space:nowrap; }
+
+/* ── CAROUSEL (TRABAJOS) ── */
+.carousel-wrap {
+  position:relative; max-width:1100px; margin:0 auto;
+  display:flex; align-items:center; gap:20px;
+}
+.carousel-track {
+  flex:1;
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:14px;
+  position:relative;
+}
+.car-slide {
+  display:none;
+  border-radius:var(--card); overflow:hidden;
+  aspect-ratio:4/3;
+  opacity:0;
+  transition:opacity .6s ease;
+}
+.car-slide.visible { display:block; }
+.car-slide.visible.shown { opacity:1; }
+.car-slide img { width:100%; height:100%; object-fit:cover; display:block; }
+.car-btn {
+  flex-shrink:0;
+  width:42px; height:42px; border-radius:50%;
+  background:var(--white); border:1.5px solid var(--border);
+  color:var(--dark); font-size:1rem; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .25s ease; box-shadow:var(--shadow);
+  user-select:none;
+}
+.car-btn:hover { background:var(--dark); color:#fff; border-color:var(--dark); }
+.car-btn[style*="pointer-events: none"] { opacity:.3; }
+
+/* email card fix */
+.card-val--email {
+  font-size:.82rem; word-break:break-all; line-height:1.4; text-align:center;
+}
+
+/* ── FOOTER ── */
+footer { background:var(--dark); color:rgba(255,255,255,.45); padding:28px 60px; display:flex; justify-content:space-between; align-items:center; }
+.f-logo { font-size:.95rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.82); }
+.f-copy { font-family:'Jost',sans-serif; font-size:.62rem; letter-spacing:.1em; }
+
+/* ── LIGHTBOX ── */
+#lightbox {
+  display:none; position:fixed; inset:0; z-index:1000;
+  background:rgba(3,57,108,.9); backdrop-filter:blur(12px);
+  align-items:center; justify-content:center;
+}
+#lightbox.open { display:flex; animation:appear .25s ease; }
+.lb-inner { position:relative; width:92vw; max-width:960px; display:flex; flex-direction:column; gap:14px; }
+.lb-close { position:absolute; top:-46px; right:0; background:none; border:none; color:#fff; font-size:1.3rem; cursor:pointer; opacity:.7; transition:opacity .2s; line-height:1; }
+.lb-close:hover { opacity:1; }
+.lb-header { display:flex; justify-content:space-between; align-items:center; }
+.lb-title { font-family:'Libre Baskerville',serif; font-size:1.1rem; color:rgba(255,255,255,.9); letter-spacing:.06em; }
+#lb-counter { font-family:'Jost',sans-serif; font-size:.7rem; color:rgba(255,255,255,.45); letter-spacing:.15em; }
+.lb-img-wrap { position:relative; display:flex; align-items:center; background:rgba(255,255,255,.05); border-radius:var(--card); overflow:hidden; min-height:280px; }
+#lb-img { width:100%; max-height:74vh; object-fit:contain; display:block; transition:opacity .18s ease; }
+.lb-arrow {
+  position:absolute; top:50%; transform:translateY(-50%);
+  background:rgba(3,57,108,.55); border:1px solid rgba(255,255,255,.18);
+  color:#fff; font-size:1.1rem; width:44px; height:44px;
+  border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:background .2s; z-index:10;
+}
+.lb-arrow:hover { background:rgba(3,57,108,.9); }
+.lb-prev { left:12px; }
+.lb-next { right:12px; }
+
+/* ── ANIMATIONS ── */
+@keyframes up { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes appear { from{opacity:0} to{opacity:1} }
+@keyframes slide-line { 0%{left:-100%} 100%{left:100%} }
+
+.reveal { opacity:0; transform:translateY(26px); transition:opacity .85s ease,transform .85s ease; }
+.reveal.vis { opacity:1; transform:translateY(0); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  nav { padding:16px 24px; }
+  .nav-links { display:none; }
+  section { padding:72px 24px; }
+  #contacto { padding:72px 24px; }
+  footer { padding:22px 24px; flex-direction:column; gap:8px; text-align:center; }
+  .frames { grid-template-columns:1fr 1fr; }
+  .cards { flex-wrap:wrap; justify-content:center; }
+  .card { min-width:200px; }
+  .s-hint { display:none; }
+}
+.hero-body h1 img {
+  width: 400px !important;
+  height: auto !important;
+  display: block !important;
+  margin: 20px auto !important;
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="cur-ring"></div>
+
+<!-- NAV -->
+<nav>
+<a href="#" class="logo">
+  <img src="logo.png">
+</a>
+  <ul class="nav-links">
+    <li><a href="#ambientes">Ambientes</a></li>
+    <li><a href="#trabajos">Trabajos</a></li>
+    <li><a href="#mapa">Ubicación</a></li>
+    <li><a href="#contacto">Contacto</a></li>
+  </ul>
+</nav>
+
+<!-- HERO: 4 slides con imágenes reales del Drive -->
+<section id="hero">
+  <!-- FACHADA_2 -->
+  <div class="slide active" style="background-image:url('https://drive.google.com/thumbnail?id=1mt7saq21UILbeexKDU8KV885M6Lv60Af&sz=w1600')"></div>
+  <!-- HALL_2 -->
+  <div class="slide" style="background-image:url('https://drive.google.com/thumbnail?id=1uHc9an0f1GZMotx3p0iA5-quGBel5lqd&sz=w1600')"></div>
+  <!-- JARDIN_3 -->
+  <div class="slide" style="background-image:url('https://drive.google.com/thumbnail?id=1wz1mXiDPgv_Dg0dIJvgtV9BbpmSKXyND&sz=w1600')"></div>
+  <!-- HABITACIÓN_1_1 -->
+  <div class="slide" style="background-image:url('https://drive.google.com/thumbnail?id=1KAXm3-hWi8LjgHr0sMXxAeEvo0mLOadu&sz=w1600')"></div>
+
+  <div class="hero-veil"></div>
+
+  <div class="hero-body">
+    <p class="h-eyebrow">Locación Profesional · Buenos Aires</p>
+    <h1>
+  <img src="logo2.png" alt="Casa Proyecto">
+  
+</h1>
+    <p class="h-sub">Espacio en alquiler para producciones audiovisuales, sesiones de fotos, videoclips, fashion films, comerciales y más. Ambientes versátiles, luz natural y carácter único.</p>
+    <a href="#ambientes" class="h-cta">Explorá los ambientes</a>
+  </div>
+
+  <div class="dots" id="dots">
+    <div class="dot on" onclick="gotoSlide(0)"></div>
+    <div class="dot" onclick="gotoSlide(1)"></div>
+    <div class="dot" onclick="gotoSlide(2)"></div>
+    <div class="dot" onclick="gotoSlide(3)"></div>
+  </div>
+
+  <div class="s-hint">
+    <span>Scroll</span>
+    <div class="s-line"></div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- AMBIENTES -->
+<section id="ambientes">
+  <div class="amb-head reveal">
+    <p class="s-label">El espacio</p>
+    <h2 class="s-title">Conocé los <em>ambientes</em></h2>
+    <div class="switch">
+      <button class="sw-btn on" id="btnB" onclick="switchFloor('baja')">Planta Baja</button>
+      <button class="sw-btn" id="btnA" onclick="switchFloor('alta')">Planta Alta</button>
+    </div>
+  </div>
+  <div class="rooms-grid" id="gridBaja"></div>
+  <div class="rooms-grid" id="gridAlta" style="display:none;"></div>
+</section>
+
+<div class="div on-white"></div>
+
+<!-- TRABAJOS -->
+<section id="trabajos">
+  <div class="tj-head reveal">
+    <p class="s-label">Portfolio</p>
+    <h2 class="s-title">Trabajos realizados<br><em>en Casa Proyecto</em></h2>
+  </div>
+  <div class="carousel-wrap reveal">
+    <button class="car-btn car-prev" onclick="carMove(-1)" aria-label="Anterior">&#8592;</button>
+    <div class="carousel-track" id="carTrack">
+      <div class="car-slide"><img src="https://drive.google.com/thumbnail?id=1y-04V6u0KykiWNWbABEtKAWXCrEsoBcn&sz=w1200" alt="Trabajo 1" loading="lazy"></div>
+      <div class="car-slide"><img src="https://drive.google.com/thumbnail?id=1Xzk4_P2uor8yQMCW48HXHwyN0sKpSgKO&sz=w1200" alt="Trabajo 2" loading="lazy"></div>
+      <div class="car-slide"><img src="https://drive.google.com/thumbnail?id=1cCHfAIhYnW4cYKqarNB7yuF1HQzC0O7J&sz=w1200" alt="Trabajo 3" loading="lazy"></div>
+      <div class="car-slide"><img src="https://drive.google.com/thumbnail?id=1F6vy1My1eAgCzAfnJncW_pXPYNqz8lLk&sz=w1200" alt="Trabajo 4" loading="lazy"></div>
+      <div class="car-slide"><img src="https://drive.google.com/thumbnail?id=1bZa7iPGncIBJhZ7SgQqb-sHlOgqMatxQ&sz=w1200" alt="Trabajo 5" loading="lazy"></div>
+      <div class="car-slide"><img src="https://drive.google.com/thumbnail?id=1i8TdpaekMjJdaBeUtf1jjQTUSQbyapor&sz=w1200" alt="Trabajo 6" loading="lazy"></div>
+      <div class="car-slide"><img src="https://drive.google.com/thumbnail?id=1D1xlYRjmgNATmFYrAzEoS_88hvbdFgOD&sz=w1200" alt="Trabajo 7" loading="lazy"></div>
+      <div class="car-slide"><img src="https://drive.google.com/thumbnail?id=1amock8VTrnrdaCndJwwuNFvC2rQNnpQV&sz=w1200" alt="Trabajo 8" loading="lazy"></div>
+      <div class="car-slide"><img src="https://drive.google.com/thumbnail?id=1M6JyJoY1szQYWRdX4iVyJpestgrQjCeL&sz=w1200" alt="Trabajo 9" loading="lazy"></div>
+    </div>
+    <button class="car-btn car-next" onclick="carMove(1)" aria-label="Siguiente">&#8594;</button>
+  </div>
+</section>
+
+<div class="div on-alt"></div>
+
+<!-- MAPA -->
+<section id="mapa">
+  <div class="mapa-top reveal">
+    <p class="s-label">Dónde encontrarnos</p>
+    <h2 class="s-title">Estamos en <em>Capital Federal</em></h2>
+    <div class="mapa-badge">📍 Floresta, Capital Federal — <a href="mailto:contactocasaproyecto@gmail.com" style="color:var(--dark);font-weight:500;text-decoration:none;">Consultá la dirección</a></div>
+  </div>
+  <div class="map-wrap reveal">
+    <iframe
+      src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d900!2d-58.50030!3d-34.63830!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses-419!2sar!4v1713400000004!5m2!1ses-419!2sar"
+      allowfullscreen=""
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
+  </div>
+</section>
+
+<!-- CONTACTO -->
+<section id="contacto">
+  <div class="reveal">
+    <p class="ct-eye">Reservas &amp; Consultas</p>
+    <h2 class="ct-title">¡Pongámonos en <em>contacto!</em></h2>
+  </div>
+  <div class="cards reveal">
+    <a href="https://instagram.com/_casaproyecto" target="_blank" class="card">
+      <div class="card-ico">📷</div>
+      <div class="card-lbl">Instagram</div>
+      <div class="card-val">@_casaproyecto</div>
+    </a>
+    <a href="mailto:contactocasaproyecto@gmail.com" class="card">
+      <div class="card-ico">✉️</div>
+      <div class="card-lbl">Correo electrónico</div>
+      <div class="card-val card-val--email">contactocasaproyecto@gmail.com</div>
+    </a>
+  </div>
+</section>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="if(event.target===this)closeLightbox()">
+  <div class="lb-inner">
+    <button class="lb-close" onclick="closeLightbox()">✕</button>
+    <div class="lb-header">
+      <span class="lb-title" id="lb-title"></span>
+      <span id="lb-counter"></span>
+    </div>
+    <div class="lb-img-wrap">
+      <button class="lb-arrow lb-prev" onclick="lbPrev()">&#8592;</button>
+      <img id="lb-img" src="" alt="">
+      <button class="lb-arrow lb-next" onclick="lbNext()">&#8594;</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="f-logo">Casa Proyecto
+    lo
+  </div>
+  <div class="f-copy">© 2026 · Locación para producciones · Buenos Aires, Argentina</div>
+</footer>
+
+<script>
+// ── Cursor ──
+const cur = document.getElementById('cur');
+const ring = document.getElementById('cur-ring');
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px'; cur.style.top = e.clientY + 'px';
+  setTimeout(() => { ring.style.left = e.clientX + 'px'; ring.style.top = e.clientY + 'px'; }, 50);
+});
+document.querySelectorAll('a,button,.folder,.dot').forEach(el => {
+  el.addEventListener('mouseenter', () => { cur.style.width='14px'; cur.style.height='14px'; ring.style.width='46px'; ring.style.height='46px'; });
+  el.addEventListener('mouseleave', () => { cur.style.width='8px'; cur.style.height='8px'; ring.style.width='32px'; ring.style.height='32px'; });
+});
+
+// ── Slideshow ──
+let curr = 0;
+const slides = document.querySelectorAll('.slide');
+const dots   = document.querySelectorAll('.dot');
+function gotoSlide(n) {
+  slides[curr].classList.remove('active'); dots[curr].classList.remove('on');
+  curr = n;
+  slides[curr].classList.add('active'); dots[curr].classList.add('on');
+}
+setInterval(() => gotoSlide((curr + 1) % slides.length), 4500);
+
+// ── Helpers ──
+function img(id) { return `https://drive.google.com/thumbnail?id=${id}&sz=w1600`; }
+function thumb(id) { return `https://drive.google.com/thumbnail?id=${id}&sz=w600`; }
+
+// ── Room data: cover + gallery ──
+const rooms = {
+  // PLANTA BAJA
+  'Cocina': {
+    cover: '1zFlzQHdlZeD0qw9H2ISE8T9TtQGoeOCO', // COCINA_4
+    gallery: ['1OyJx3QUXkO9CvVXo1GjEN9_Vk74waW2o','1MNMR5qtMuy0iFHb5HcwJVHgAfTpOT31N','1La1pycoUUU6Qqk265oLnzdyk_M5COwBV','1zFlzQHdlZeD0qw9H2ISE8T9TtQGoeOCO','1rr3gPLGLaUe-n-R9ASPuX5I2YQXdob_4','1wh2919oTYNgKw43XlCsFiNd5egEWrgQu','1YepJUP748RVjeYW-BLLm6l1xYj5Qm6qX']
+  },
+  'Estudio': {
+    cover: '1OSatHGSKkkEudM7L9v1sVQ4Q4l0KfeRQ', // ESTUDIO_1
+    gallery: ['1OSatHGSKkkEudM7L9v1sVQ4Q4l0KfeRQ','1xWgM83KUVCNEgUrU0wBSMeCDL6HQ7xiE','1Xm1Dd2iCIZTql0svydvSTid-Bc3WJUEX','1IU-VvtV4Qy7bSHx7P-pCGsK3o_L2XbOa']
+  },
+  'Fachada': {
+    cover: '1mt7saq21UILbeexKDU8KV885M6Lv60Af', // FACHADA_2
+    gallery: ['1Fpn68VkD2rImcEG3Js7pmh4BWRBJt4dV','1mt7saq21UILbeexKDU8KV885M6Lv60Af','1Qbq-rz2hCuiIUB0TqPlSKNSHsX1EURIE','1_14H7-7g2OXBoLaehcBXSzVuITOmZIQk']
+  },
+  'Garage': {
+    cover: '1Sw7rk8JVUFhu8UX9iAwoeDYScCVGP5ZC', // GARAGE_4
+    gallery: ['1Gu_mMivgESVFSIqJpz_6T2jl6pVAmmnG','1YJRghcpYN_7qRs6yq3wnHJHDkxAUnHBs','1yywZfYd5uZM1jD9VPy64e_eXEtjupG7u','1Sw7rk8JVUFhu8UX9iAwoeDYScCVGP5ZC','1CR9_flaxIK5Y5rrJG258XWPg00XfnhbK']
+  },
+  'Hall de Distribución': {
+    cover: '1jyZ1_9iym8SG_XsLCKGKvFV2FeUdaVh1', // HALL_1
+    gallery: ['1jyZ1_9iym8SG_XsLCKGKvFV2FeUdaVh1','1uHc9an0f1GZMotx3p0iA5-quGBel5lqd','1GE2w6We39C4Izqqg7nrX2XD96gLpi1D_','1_6T59GomEaKsze3pCc83BLM1yUuwr1_f','1CZiqDx1eTufOK7Msie0Cv60DPYf86aI2','1Z8yhLVvDE2uZcT-CXytxHP_Tlpj9ZSEB']
+  },
+  'Living-Comedor': {
+    cover: '1N_1bf70eVZM4r0txzXqRi4MrhC-qPsEM', // LIVING_COMEDOR_2
+    gallery: ['1G2Fuz49Z4I6cHpFn_sGkgRb_aHxtsGUi','1N_1bf70eVZM4r0txzXqRi4MrhC-qPsEM','1b7DXCBw970s7oQ5aHSLdCwBzscX-kn5W','1GmYHb9IRvnwUUw0H_hEA1Apl4Zayb0ul','1D_4YQWhKaJg7BTrQfRM0PoasIORVjdZJ','1iI47_zxpELHlXtvcfZElBIFmwovvQEKh']
+  },
+  'Patio': {
+    cover: '1wz1mXiDPgv_Dg0dIJvgtV9BbpmSKXyND', // JARDIN_3
+    gallery: ['1QYwrzXMLQr0c-F0CjnMp4cNEVqS37We7','10P0UHr_pU6LxD4NKlyagATsCMAKp26nN','1wz1mXiDPgv_Dg0dIJvgtV9BbpmSKXyND','1a5WMHTnllOOjxaDEkZSfnZdGW7DMny3w','1DAWqlNEN28xyKLPDhMaC9-m9OtIz3tqR','1hnaacPMzgWcSJnXyZRE5udfxJjnxIxHs','15TIFGEgVxpHKjSamsZpDvIa9XVfhkXbV','1H5JPgkv3XvQMEyumcLQop1Cpt2co_NGm','1nvZ34pQ9ahSuax73mAWO2UwQJVNiJQ-6']
+  },
+  'Toilette': {
+    cover: '1ulq75auG3wjN1l9dJ2300Pk0rOM9vI1y', // TOILETTE_2
+    gallery: ['10iEA13qCbsbx0mjLKaVra7JwsqtJbdYc','1ulq75auG3wjN1l9dJ2300Pk0rOM9vI1y']
+  },
+  // PLANTA ALTA
+  'Baño': {
+    cover: '1piQXMpPSGNsqFjuy3x8earYOMHwD7roW', // BAÑO_1
+    gallery: ['1piQXMpPSGNsqFjuy3x8earYOMHwD7roW','1UgztIznxN1oB9wOF7Q1X2yVv0ctV5XxM']
+  },
+  'Habitación 1': {
+    cover: '1KAXm3-hWi8LjgHr0sMXxAeEvo0mLOadu', // HABITACIÓN_1_1
+    gallery: ['1KAXm3-hWi8LjgHr0sMXxAeEvo0mLOadu','1Vd0jt-esUNcPDjqv_lsCvhJihjzY9B5B','1SQYe2D6VRA2cy2GwgQou6i9BbTrj-AMb']
+  },
+  'Habitación 2': {
+    cover: '1-NskE237mWib1vrgkMkpT5XEX93_OkOg', // HABITACIÓN_2_2
+    gallery: ['1c-dXAlio0z0wT1PCwinMw3MjoWDfcUwF','1-NskE237mWib1vrgkMkpT5XEX93_OkOg','1Fe7XJmspzmt4pt0Yzec4mNyGjzCADm0N','1cg_e--TaLjpGT1EfeLTyaEvRRV7nlfZ_','1vAKKEaxHcVshTif16XdmfHC0BtPlGw5B','1Yr5QjoVlkF4O-aejJdc7I3MCvlc_YxMV','1uuIXn6Fnm6em2dv7Xmx2MLlTcPyEnfOt','1IL3Oz0JERZ3Xt_AALJQeN4tjN68_MaUQ']
+  },
+  'Lavadero': {
+    cover: '1bwV6Ezw-YjBKYk7SCC0XnJQq5M6WTe3k', // LAVADERO_2
+    gallery: ['1GQ9268DdZlIYUlIKiz1ydX-1FzjrH9pJ','1bwV6Ezw-YjBKYk7SCC0XnJQq5M6WTe3k']
+  },
+  'Pasillo': {
+    cover: '1z9F7xHb50-lRooK0yb-qFsBMBjcJB-md', // PASILLO_3
+    gallery: ['1upM1TNK4U_ByGLVngkD6nzuUnwW0J1BR','1Nn4ZgvhHRv7qRBlEKGJKCgrxLu6x8cNw','1z9F7xHb50-lRooK0yb-qFsBMBjcJB-md','1ZtuzcrRGS_llfv5oDPOdGvpGxpvpXOlx']
+  },
+  'Suite': {
+    cover: '1Kp_ChY3tUqF4iA-84UQ9kjoKp7M-adkE', // SUITE_1
+    gallery: ['1Kp_ChY3tUqF4iA-84UQ9kjoKp7M-adkE','1-rIq8QIz-F1Ra3r_M4SVLq0zpPgdeKXY']
+  },
+  'Terraza': {
+    cover: '1kzDP7_CUeqE3Ij9DoR7E1rxtc1lCGdHA', // TERRAZA_2
+    gallery: ['1qodd-81RklDrzsLOiT98WujKybD7Y0y_','1kzDP7_CUeqE3Ij9DoR7E1rxtc1lCGdHA','1g4Bjih2TFwtX2aVc--3abMY73C5v-LDR','1ePs-tXP1vksTvy_8LBEQC47ucfIUloSk']
+  },
+};
+
+// ── Lightbox ──
+let lbImages = [], lbIndex = 0;
+function openLightbox(name) {
+  const data = rooms[name]; if (!data) return;
+  lbImages = data.gallery.map(id => img(id));
+  lbIndex = 0;
+  document.getElementById('lb-title').textContent = name;
+  showLbSlide();
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); document.body.style.overflow = ''; }
+function showLbSlide() {
+  const el = document.getElementById('lb-img');
+  el.style.opacity = '0';
+  setTimeout(() => { el.src = lbImages[lbIndex]; el.onload = () => el.style.opacity='1'; document.getElementById('lb-counter').textContent = (lbIndex+1)+' / '+lbImages.length; }, 160);
+}
+function lbNext() { lbIndex = (lbIndex+1)%lbImages.length; showLbSlide(); }
+function lbPrev() { lbIndex = (lbIndex-1+lbImages.length)%lbImages.length; showLbSlide(); }
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lightbox').classList.contains('open')) return;
+  if (e.key==='Escape') closeLightbox();
+  if (e.key==='ArrowRight') lbNext();
+  if (e.key==='ArrowLeft')  lbPrev();
+});
+
+// ── Build grids ──
+const plantaBaja = ['Cocina','Estudio','Fachada','Garage','Hall de Distribución','Living-Comedor','Patio','Toilette'];
+const plantaAlta = ['Baño','Habitación 1','Habitación 2','Lavadero','Pasillo','Suite','Terraza'];
+
+function buildGrid(names, containerId) {
+  const grid = document.getElementById(containerId);
+  names.forEach(name => {
+    const data = rooms[name];
+    const count = data ? data.gallery.length : 0;
+    const div = document.createElement('div');
+    div.className = 'folder';
+    div.onclick = () => openLightbox(name);
+    div.innerHTML = `
+      <div class="f-cover-wrap">
+        ${data && data.cover
+          ? `<img class="f-cover" src="${thumb(data.cover)}" alt="${name}" loading="lazy">`
+          : `<div class="f-cover-placeholder"><svg viewBox="0 0 48 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 10H45V33H3V10Z" stroke="#B3CDE0" stroke-width="1.5" stroke-linejoin="round"/><path d="M3 10L14 4H45" stroke="#B3CDE0" stroke-width="1.5"/><path d="M14 4V10" stroke="#B3CDE0" stroke-width="1.5"/></svg></div>`
+        }
+        <div class="f-overlay"></div>
+      </div>
+      <div class="f-footer">
+        <span class="f-name">${name}</span>
+        <span class="f-tag">${count ? count+' foto'+(count>1?'s':'') : 'próximamente'}</span>
+      </div>`;
+    grid.appendChild(div);
+  });
+}
+buildGrid(plantaBaja, 'gridBaja');
+buildGrid(plantaAlta, 'gridAlta');
+
+// ── Floor switch ──
+function switchFloor(f) {
+  const gb=document.getElementById('gridBaja'), ga=document.getElementById('gridAlta');
+  const bb=document.getElementById('btnB'), ba=document.getElementById('btnA');
+  if (f==='baja') { gb.style.display='grid'; ga.style.display='none'; bb.classList.add('on'); ba.classList.remove('on'); }
+  else            { gb.style.display='none'; ga.style.display='grid'; ba.classList.add('on'); bb.classList.remove('on'); }
+}
+
+// ── Active nav on scroll ──
+const sections = document.querySelectorAll('#hero,#ambientes,#trabajos,#mapa,#contacto');
+const navAs = document.querySelectorAll('.nav-links a');
+const navH = document.querySelector('nav').offsetHeight;
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - navH - 10) current = s.id; });
+  navAs.forEach(a => { a.classList.toggle('active', a.getAttribute('href')==='#'+current); });
+}, { passive:true });
+
+// ── Nav scroll opacity ──
+const navEl = document.querySelector('nav');
+window.addEventListener('scroll', () => {
+  navEl.classList.toggle('scrolled', window.scrollY > 80);
+}, { passive:true });
+
+// ── Carousel with fade ──
+let carIndex = 0;
+const perPage = 2;
+
+function carRender(animate) {
+  const slides = document.querySelectorAll('.car-slide');
+  const total = slides.length;
+  slides.forEach((s, i) => {
+    const inView = i >= carIndex && i < carIndex + perPage;
+    if (inView) {
+      s.classList.add('visible');
+      if (animate) {
+        s.classList.remove('shown');
+        requestAnimationFrame(() => requestAnimationFrame(() => s.classList.add('shown')));
+      } else {
+        s.classList.add('shown');
+      }
+    } else {
+      s.classList.remove('visible', 'shown');
+    }
+  });
+  const prev = document.querySelector('.car-prev');
+  const next = document.querySelector('.car-next');
+  prev.style.opacity = carIndex === 0 ? '.3' : '1';
+  prev.style.pointerEvents = carIndex === 0 ? 'none' : 'auto';
+  next.style.opacity = carIndex + perPage >= total ? '.3' : '1';
+  next.style.pointerEvents = carIndex + perPage >= total ? 'none' : 'auto';
+}
+
+function carMove(dir) {
+  const slides = document.querySelectorAll('.car-slide');
+  carIndex = Math.max(0, Math.min(carIndex + dir * perPage, slides.length - perPage));
+  carRender(true);
+}
+
+carRender(false);
+
+// ── Scroll reveal ──
+const obs = new IntersectionObserver(entries => {
+  entries.forEach((e,i) => { if(e.isIntersecting) setTimeout(()=>e.target.classList.add('vis'), i*70); });
+}, { threshold:0.1 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
